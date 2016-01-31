@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeoutException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -31,7 +30,6 @@ public class HTTPGrabber implements dktrotti.transitr.Observable {
 
     /**
      * Retrieves the .pb file from the server.
-     * @return Returns a string containing the result of the operation.
      * @throws IOException Thrown if an error occured during the transmission.
      */
     public void retrieveFile() throws IOException {
