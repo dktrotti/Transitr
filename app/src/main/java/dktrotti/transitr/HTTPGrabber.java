@@ -22,8 +22,10 @@ import okhttp3.Response;
  * Created by Dominic on 16-01-30.
  */
 public class HTTPGrabber implements dktrotti.transitr.Observable {
-    private static String connstr = "https://data.edmonton.ca/download/7qed-k2fc/application/octet-stream";
-    public static String path = "/data/data/dktrotti.transitr/VehicleLocations.pb";
+    private static String vehicleConnStr = "https://data.edmonton.ca/download/7qed-k2fc/application/octet-stream";
+    public static String tripConnStr = "https://data.edmonton.ca/download/uzpc-8bnm/application/octet-stream";
+    public static String vehiclePath = "/data/data/dktrotti.transitr/VehicleLocations.pb";
+    public static String tripPath = "/data/data/dktrotti.transitr/TripUpdates.pb";
 
     private ArrayList<Observer> observers = new ArrayList<>();
 
@@ -41,7 +43,8 @@ public class HTTPGrabber implements dktrotti.transitr.Observable {
         Throwable ex;
 
         protected String doInBackground(String... params) {
-            File file = new File(path);
+            File vehicleFile = new File(vehiclePath);
+            File tripFile = new File(tripPath);
             Integer count = 0;
 
             Long total = 0L;
@@ -49,14 +52,40 @@ public class HTTPGrabber implements dktrotti.transitr.Observable {
             try {
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url(connstr)
+                        .url(vehicleConnStr)
                         .build();
                 Response response = client.newCall(request).execute();
 
                 InputStream is = response.body().byteStream();
 
                 BufferedInputStream input = new BufferedInputStream(is);
-                OutputStream output = new FileOutputStream(file);
+                OutputStream output = new FileOutputStream(vehicleFile);
+
+                byte[] data = new byte[1024];
+
+                while ((count = input.read(data)) != -1) {
+                    total += count;
+                    output.write(data, 0, count);
+                }
+
+                output.flush();
+                output.close();
+                input.close();
+            } catch (IOException e) {
+                ex = e;
+            }
+
+            try {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url(tripConnStr)
+                        .build();
+                Response response = client.newCall(request).execute();
+
+                InputStream is = response.body().byteStream();
+
+                BufferedInputStream input = new BufferedInputStream(is);
+                OutputStream output = new FileOutputStream(tripFile);
 
                 byte[] data = new byte[1024];
 

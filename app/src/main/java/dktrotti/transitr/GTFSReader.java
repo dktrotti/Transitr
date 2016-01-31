@@ -9,6 +9,7 @@ import com.squareup.wire.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 
 /**
  * Reads GTFS data.
@@ -18,17 +19,37 @@ import java.io.FileNotFoundException;
 public class GTFSReader implements Observer {
 
     public void readData() {
-        GtfsRealtime.FeedMessage feedMessage;
+        GtfsRealtime.FeedMessage vehicleFeedMessage;
+        GtfsRealtime.FeedMessage tripFeedMessage;
+
         try {
-            feedMessage = GtfsRealtime.FeedMessage.parseFrom(new FileInputStream(HTTPGrabber.path));
+            vehicleFeedMessage = GtfsRealtime.FeedMessage.parseFrom(new FileInputStream(HTTPGrabber.vehiclePath));
+            tripFeedMessage = GtfsRealtime.FeedMessage.parseFrom(new FileInputStream(HTTPGrabber.tripPath));
         } catch (Exception e) {
             return;
         }
+
+        HashMap<String, String> trips = new HashMap<>();
+        HashMap<String, Integer> delays = new HashMap<>();
+        for (GtfsRealtime.FeedEntity trip: tripFeedMessage.getEntityList()) {
+            trips.put(trip.getId(), trip.getTripUpdate().getTrip().getRouteId());
+            if (trip.getTripUpdate().getDelay() > 0) {
+                delays.put(trip.getId(), trip.getTripUpdate().getDelay());
+            }
+        }
+
         GtfsRealtime.Position buspos;
         MapManager.getInstance().clearBusses();
-        for (GtfsRealtime.FeedEntity bus: feedMessage.getEntityList()) {
+        for (GtfsRealtime.FeedEntity bus: vehicleFeedMessage.getEntityList()) {
             buspos = bus.getVehicle().getPosition();
-            MapManager.getInstance().addBus(new LatLng(buspos.getLatitude(), buspos.getLongitude()));
+            if (delays.containsKey(bus.getVehicle().getTrip().getTripId())) {
+                MapManager.getInstance().addBus(new LatLng(buspos.getLatitude(), buspos.getLongitude()),
+                        trips.get(bus.getVehicle().getTrip().getTripId()),
+                        delays.get(bus.getVehicle().getTrip().getTripId()));
+            } else {
+                MapManager.getInstance().addBus(new LatLng(buspos.getLatitude(), buspos.getLongitude()),
+                        trips.get(bus.getVehicle().getTrip().getTripId()));
+            }
         }
     }
 

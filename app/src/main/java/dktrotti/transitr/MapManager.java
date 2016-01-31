@@ -52,6 +52,31 @@ public class MapManager {
         busMarkers.add(map.addMarker(options));
     }
 
+    public void addBus(LatLng latLng, String route) {
+        if (map == null) {
+            return;
+        }
+        MarkerOptions options = new MarkerOptions()
+                .position(latLng)
+                .title(route)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus))
+                .anchor(0.5f, 0.5f);
+        busMarkers.add(map.addMarker(options));
+    }
+
+    public void addBus(LatLng latLng, String route, int delay) {
+        if (map == null) {
+            return;
+        }
+        MarkerOptions options = new MarkerOptions()
+                .position(latLng)
+                .title(route)
+                .snippet("Delay: " + ((Integer) (delay / 60)).toString() + " mins")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.bus))
+                .anchor(0.5f, 0.5f);
+        busMarkers.add(map.addMarker(options));
+    }
+
     public void clearBusses() {
         for (Marker bus: busMarkers) {
             bus.remove();

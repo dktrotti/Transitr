@@ -87,11 +87,11 @@ public class MainActivity extends AppCompatActivity implements
             new AlertDialog.Builder(this).setTitle(getString(R.string.about_box_title))
                     .setMessage(getString(R.string.about_box_message))
                     .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            })
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
                     .show();
         }
 
@@ -134,6 +134,8 @@ public class MainActivity extends AppCompatActivity implements
             MapManager.getInstance().moveCamera(mLastLocation);
             MapManager.getInstance().setZoom(13.0f);
         }
+
+        mMapFragment.getMap().getUiSettings().setMapToolbarEnabled(false);
     }
 
     @Override
