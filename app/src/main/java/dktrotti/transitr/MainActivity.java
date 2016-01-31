@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_about) {
             new AlertDialog.Builder(this).setTitle(getString(R.string.about_box_title))
                     .setMessage(getString(R.string.about_box_message))

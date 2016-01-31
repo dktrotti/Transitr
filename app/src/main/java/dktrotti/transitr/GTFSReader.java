@@ -1,14 +1,9 @@
 package dktrotti.transitr;
 
-import android.util.Log;
-
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.transit.realtime.GtfsRealtime;
-import com.squareup.wire.*;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 /**
