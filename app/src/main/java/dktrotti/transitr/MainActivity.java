@@ -1,16 +1,63 @@
 package dktrotti.transitr;
 
+import android.app.FragmentTransaction;
+import android.location.Location;
+import android.location.LocationListener;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+
+public class MainActivity extends AppCompatActivity implements
+        OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        com.google.android.gms.location.LocationListener {
+    private MapFragment mMapFragment;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mMapFragment = MapFragment.newInstance();
+        FragmentTransaction fragmentTransaction =
+                getFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.mainLayout, mMapFragment);
+        fragmentTransaction.commit();
+        mMapFragment.getMapAsync(this);
+
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mLocationRequest.setInterval(5000);
     }
 
     @Override
@@ -33,5 +80,75 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        startLocationUpdates();
+    }
+
+    @Override
+    public void onConnectionSuspended(int num) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        MapManager.getInstance().setMap(mMapFragment.getMap());
+        if (mLastLocation != null) {
+            MapManager.getInstance().updateLocation(mLastLocation);
+            MapManager.getInstance().setZoom(13.0f);
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation = location;
+        if (mLastLocation != null) {
+            MapManager.getInstance().updateLocation(mLastLocation);
+        }
+    }
+
+    public void onUpdateButtonClick(View view) {
+        try {
+            update();
+            //(new HTTPGrabber()).update();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    public void update() {
+        HTTPGrabber grab = new HTTPGrabber();
+        GTFSReader reader = new GTFSReader();
+
+        grab.addObserver(reader);
+        try {
+            grab.retrieveFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
