@@ -1,9 +1,12 @@
 package dktrotti.transitr;
 
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Handler;
+import android.preference.DialogPreference;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -80,8 +83,16 @@ public class MainActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_about) {
+            new AlertDialog.Builder(this).setTitle(getString(R.string.about_box_title))
+                    .setMessage(getString(R.string.about_box_message))
+                    .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            })
+                    .show();
         }
 
         return super.onOptionsItemSelected(item);
