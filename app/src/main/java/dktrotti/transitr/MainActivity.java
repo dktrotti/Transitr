@@ -3,6 +3,7 @@ package dktrotti.transitr;
 import android.app.FragmentTransaction;
 import android.location.Location;
 import android.location.LocationListener;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements
         mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         mLocationRequest.setInterval(5000);
+
+        mHandler = new Handler();
+        busUpdater.run();
     }
 
     @Override
@@ -115,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements
         MapManager.getInstance().setMap(mMapFragment.getMap());
         if (mLastLocation != null) {
             MapManager.getInstance().updateLocation(mLastLocation);
+            MapManager.getInstance().moveCamera(mLastLocation);
             MapManager.getInstance().setZoom(13.0f);
         }
     }
@@ -130,9 +136,16 @@ public class MainActivity extends AppCompatActivity implements
     public void onUpdateButtonClick(View view) {
         try {
             update();
-            //(new HTTPGrabber()).update();
         } catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    public void onLocationButtonClick(View view) {
+        if (mLastLocation != null) {
+            MapManager.getInstance().updateLocation(mLastLocation);
+            MapManager.getInstance().moveCamera(mLastLocation);
+            MapManager.getInstance().setZoom(13.0f);
         }
     }
 
@@ -151,4 +164,15 @@ public class MainActivity extends AppCompatActivity implements
             e.printStackTrace();
         }
     }
+
+    private Runnable busUpdater = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                update();
+            } finally {
+                mHandler.postDelayed(busUpdater, 30000);
+            }
+        }
+    };
 }

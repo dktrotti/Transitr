@@ -35,7 +35,6 @@ public class MapManager {
 
     private MapManager() {
         busMarkers = new ArrayList<>();
-
     }
 
     public void setMap(GoogleMap map) {
