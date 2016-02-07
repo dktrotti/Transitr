@@ -1,15 +1,10 @@
 package dktrotti.transitr;
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.location.Location;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -25,7 +20,6 @@ public class MapManager {
     private static MapManager ourInstance = new MapManager();
 
     private GoogleMap map;
-    private BitmapDescriptor busIcon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
     private ArrayList<Marker> busMarkers;
     private Marker userMarker;
 
@@ -41,7 +35,7 @@ public class MapManager {
         this.map = map;
     }
 
-    public void addBus(LatLng latLng) {
+    public void addBusMarker(LatLng latLng) {
         if (map == null) {
             return;
         }
@@ -52,7 +46,7 @@ public class MapManager {
         busMarkers.add(map.addMarker(options));
     }
 
-    public void addBus(LatLng latLng, String route) {
+    public void addBusMarker(LatLng latLng, String route) {
         if (map == null) {
             return;
         }
@@ -64,7 +58,7 @@ public class MapManager {
         busMarkers.add(map.addMarker(options));
     }
 
-    public void addBus(LatLng latLng, String route, int delay) {
+    public void addBusMarker(LatLng latLng, String route, int delay) {
         if (map == null) {
             return;
         }
@@ -77,7 +71,7 @@ public class MapManager {
         busMarkers.add(map.addMarker(options));
     }
 
-    public void clearBusses() {
+    public void clearBuses() {
         for (Marker bus: busMarkers) {
             bus.remove();
         }

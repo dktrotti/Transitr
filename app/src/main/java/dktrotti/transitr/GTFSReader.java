@@ -34,15 +34,15 @@ public class GTFSReader implements Observer {
         }
 
         GtfsRealtime.Position buspos;
-        MapManager.getInstance().clearBusses();
+        MapManager.getInstance().clearBuses();
         for (GtfsRealtime.FeedEntity bus: vehicleFeedMessage.getEntityList()) {
             buspos = bus.getVehicle().getPosition();
             if (delays.containsKey(bus.getVehicle().getTrip().getTripId())) {
-                MapManager.getInstance().addBus(new LatLng(buspos.getLatitude(), buspos.getLongitude()),
+                MapManager.getInstance().addBusMarker(new LatLng(buspos.getLatitude(), buspos.getLongitude()),
                         trips.get(bus.getVehicle().getTrip().getTripId()),
                         delays.get(bus.getVehicle().getTrip().getTripId()));
             } else {
-                MapManager.getInstance().addBus(new LatLng(buspos.getLatitude(), buspos.getLongitude()),
+                MapManager.getInstance().addBusMarker(new LatLng(buspos.getLatitude(), buspos.getLongitude()),
                         trips.get(bus.getVehicle().getTrip().getTripId()));
             }
         }
